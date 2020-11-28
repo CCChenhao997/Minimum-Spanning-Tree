@@ -10,9 +10,9 @@
 
 ### Project 4: Minimum Spanning Tree
 
-Implement and compare the following Minimum Spanning Trees algorithms:
-● Kruskal algorithm
-● Prim algorithm
+Implement and compare the following Minimum Spanning Trees algorithms:   
+● Kruskal algorithm    
+● Prim algorithm   
 
 -----------------------
 
