@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+<title>CSE5211 Project</title>
+<script src="../static/jquery-3.4.1.min.js"></script>
+<script src="../static/echarts.js"></script>
+
+<style type="text/css">
+    body {
+        background: rgb(41, 188, 214);
+    }
+    .text{
+        width: 100%;
+        text-align: center;
+    }
+    .ta{
+		margin-top: 20px;
+        height:200px;
+        width: 50%;
+        resize: none;
+    }
+    .submit{
+        margin-top: 20px;
+        height: 30px;
+        width: 100%;
+        text-align: center;
+    }
+    .btn{
+        height: 25px;
+        width: 15%;
+	}
+    .b{
+        position: relative;
+        margin-top: 5px;
+		left: 25%;
+		height:100px;
+        width: 50%;
+        background: #FFFFFF;
+        white-space: pre-wrap;
+    }
+
+</style>
+</head>
+
+<body>
+    <div class="text">
+        <textarea cols="100" rows="20" id="in" class="ta" style="font-size:15px">
+V1-V2-6
+V1-V3-1
+V1-V4-5
+V2-V3-5
+V2-V5-3
+V3-V4-5
+V3-V5-6
+V3-V6-4
+V4-V6-2
+V5-V6-6</textarea>
+    </div>
+
+    <div class="submit">
+
+        <button type="button" class="btn" onclick="genGraph()">Original Graph</button>
+        <button type="button" class="btn" onclick="ClearTextArea()">Clear</button>
+        
+    </div>
+    <!-- <br> -->
+
+    <div class="b" id="graph" style="height: 500px;"></div>
+
+    <div class="submit">
+        <button type="button" class="btn" onclick="genPrimTree()">Prim Tree</button>
+    </div>
+
+    <div class="b" id="prim" style="height: 500px;"></div>
+
+    <div class="submit">
+        <button type="button" class="btn" onclick="genPrimTreeWithHeap()">Prim Tree with Heap</button>
+    </div>
+
+    <div class="b" id="prim_with_heap" style="height: 500px;"></div>
+
+    <div class="submit">
+        <button type="button" class="btn" onclick="genKruskalTree()">Kruskal Tree</button>
+    </div>
+
+    <div class="b" id="kruskal" style="height: 500px;"></div>
+    
+    <script type="text/javascript">
+
+        function genGraph() {
+            var text = $('#in').val()
+			var data_temp={"text":text}
+            $.ajax({
+                url: '/graph',
+                data: JSON.stringify(data_temp),
+                type: "POST",
+                async: false,
+                cache: false,
+                contentType: false,
+                processData: false,
+                success: function(data) {
+                    console.log(data)
+                    document.getElementById('show').innerText = data; //JSON.stringify(data, null, 4);
+                },
+                error: function() {
+                    //失败
+                }
+            });
+            
+            // * Graph
+            var myChart = echarts.init(document.getElementById('graph'));
+            myChart.showLoading();
+            $.get('/graph', function (webkitDep) {
+                myChart.hideLoading();
+                option = {
+                    series: [{
+                        type: 'graph',
+                        layout: 'force',
+                        animation: false,
+                        label: {
+                            position: 'right',
+                            formatter: '{b}'
+                        },
+                        label: {
+                            show: true
+                        },
+                        draggable: true,    //指示节点是否可以拖动
+                        data: webkitDep.nodes.map(function (node, idx) {
+                            node.id = idx;
+                            return node;
+                        }),
+                        //categories: webkitDep.categories,
+                        force: {
+                            edgeLength: 60,
+                            repulsion: 1500,
+                            gravity: 0.2
+                        },
+                        edges: webkitDep.links,
+                        edgeLabel: {
+                            normal: {
+                                show: true,
+                                textStyle: {                
+                                    fontSize: 12,
+                                    color: "#000000"    
+                                },
+                                formatter: function(param) {
+                                    return param.data.name;
+                                }
+                            }
+                        },
+                        roam: true,
+                        lineStyle: {
+                            normal: {
+                                show : true,
+                                width: 2,
+                                color: 'source',
+                                curveness: 0
+                            }
+                        },
+                        //edgeSymbol: ['circle', 'arrow'],
+                        edgeSymbol: ['circle', 'circle'],
+                        edgeSymbolSize: [5, 5],
+                        symbolSize: 30,
+
+                    }]
+                };
+
+                myChart.setOption(option);
+            });
+		}
+        
+        function genPrimTree() {
+            var text = $('#in').val()
+            var data_temp={"text":text}
+            $.ajax({
+                url: '/prim',
+                data: JSON.stringify(data_temp),
+                type: "POST",
+                async: false,
+                cache: false,
+                contentType: false,
+                processData: false,
+                success: function(data) {
+                    console.log(data)
+                    document.getElementById('show').innerText = data; //JSON.stringify(data, null, 4);
+                },
+                error: function() {
+                    //失败
+                }
+            });
+
+            // * Prim
+            var myChart = echarts.init(document.getElementById('prim'));
+            myChart.showLoading();
+            $.get('/prim', function (webkitDep) {
+                myChart.hideLoading();
+                option = {
+                    series: [{
+                        type: 'graph',
+                        layout: 'force',
+                        animation: false,
+                        label: {
+                            position: 'right',
+                            formatter: '{b}'
+                        },
+                        label: {
+                            show: true
+                        },
+                        draggable: true,    //指示节点是否可以拖动
+                        data: webkitDep.nodes.map(function (node, idx) {
+                            node.id = idx;
+                            return node;
+                        }),
+                        //categories: webkitDep.categories,
+                        force: {
+                            edgeLength: 60,
+                            repulsion: 1500,
+                            gravity: 0.2
+                        },
+                        edges: webkitDep.links,
+                        edgeLabel: {
+                            normal: {
+                                show: true,
+                                textStyle: {                
+                                    fontSize: 12,
+                                    color: "#000000"    
+                                },
+                                formatter: function(param) {
+                                    return param.data.name;
+                                }
+                            }
+                        },
+                        roam: true,
+                        lineStyle: {
+                            normal: {
+                                show : true,
+                                width: 2,
+                                color: 'source',
+                                curveness: 0
+                            }
+                        },
+                        //edgeSymbol: ['circle', 'arrow'],
+                        edgeSymbol: ['circle', 'circle'],
+                        edgeSymbolSize: [5, 5],
+                        symbolSize: 30,
+
+                    }]
+                };
+
+                myChart.setOption(option);
+            });
+        }
+
+        function genPrimTreeWithHeap() {
+            var text = $('#in').val()
+            var data_temp={"text":text}
+            $.ajax({
+                url: '/prim_with_heap',
+                data: JSON.stringify(data_temp),
+                type: "POST",
+                async: false,
+                cache: false,
+                contentType: false,
+                processData: false,
+                success: function(data) {
+                    console.log(data)
+                    document.getElementById('show').innerText = data; //JSON.stringify(data, null, 4);
+                },
+                error: function() {
+                    //失败
+                }
+            });
+
+            // * Prim with Heap
+            var myChart = echarts.init(document.getElementById('prim_with_heap'));
+            myChart.showLoading();
+            $.get('/prim_with_heap', function (webkitDep) {
+                myChart.hideLoading();
+                option = {
+                    series: [{
+                        type: 'graph',
+                        layout: 'force',
+                        animation: false,
+                        label: {
+                            position: 'right',
+                            formatter: '{b}'
+                        },
+                        label: {
+                            show: true
+                        },
+                        draggable: true,    //指示节点是否可以拖动
+                        data: webkitDep.nodes.map(function (node, idx) {
+                            node.id = idx;
+                            return node;
+                        }),
+                        //categories: webkitDep.categories,
+                        force: {
+                            edgeLength: 60,
+                            repulsion: 1500,
+                            gravity: 0.2
+                        },
+                        edges: webkitDep.links,
+                        edgeLabel: {
+                            normal: {
+                                show: true,
+                                textStyle: {                
+                                    fontSize: 12,
+                                    color: "#000000"    
+                                },
+                                formatter: function(param) {
+                                    return param.data.name;
+                                }
+                            }
+                        },
+                        roam: true,
+                        lineStyle: {
+                            normal: {
+                                show : true,
+                                width: 2,
+                                color: 'source',
+                                curveness: 0
+                            }
+                        },
+                        //edgeSymbol: ['circle', 'arrow'],
+                        edgeSymbol: ['circle', 'circle'],
+                        edgeSymbolSize: [5, 5],
+                        symbolSize: 30,
+
+                    }]
+                };
+
+                myChart.setOption(option);
+            });
+        }
+
+        function genKruskalTree() {
+            var text = $('#in').val()
+			var data_temp={"text":text}
+            $.ajax({
+                url: '/kruskal',
+                data: JSON.stringify(data_temp),
+                type: "POST",
+                async: false,
+                cache: false,
+                contentType: false,
+                processData: false,
+                success: function(data) {
+                    console.log(data)
+                    document.getElementById('show').innerText = data;
+                },
+                error: function() {
+                    //failed
+                }
+            });
+
+            // * kruskal
+            var myChart = echarts.init(document.getElementById('kruskal'));
+            myChart.showLoading();
+            $.get('/kruskal', function (webkitDep) {
+                myChart.hideLoading();
+                option = {
+                    series: [{
+                        type: 'graph',
+                        layout: 'force',
+                        animation: false,
+                        label: {
+                            position: 'right',
+                            formatter: '{b}'
+                        },
+                        label: {
+                            show: true
+                        },
+                        draggable: true,    //指示节点是否可以拖动
+                        data: webkitDep.nodes.map(function (node, idx) {
+                            node.id = idx;
+                            return node;
+                        }),
+                        //categories: webkitDep.categories,
+                        force: {
+                            edgeLength: 60,
+                            repulsion: 1500,
+                            gravity: 0.2
+                        },
+                        edges: webkitDep.links,
+                        edgeLabel: {
+                            normal: {
+                                show: true,
+                                textStyle: {                
+                                    fontSize: 12,
+                                    color: "#000000"    
+                                },
+                                formatter: function(param) {
+                                    return param.data.name;
+                                }
+                            }
+                        },
+                        roam: true,
+                        lineStyle: {
+                            normal: {
+                                show : true,
+                                width: 2,
+                                color: 'source',
+                                curveness: 0
+                            }
+                        },
+                        //edgeSymbol: ['circle', 'arrow'],
+                        edgeSymbol: ['circle', 'circle'],
+                        edgeSymbolSize: [5, 5],
+                        symbolSize: 30,
+
+                    }]
+                };
+
+                myChart.setOption(option);
+            });
+        }
+
+		function ClearTextArea(){
+            document.getElementById("in").value = "";
+            document.getElementById('graph').innerHTML = "";
+            document.getElementById('prim').innerHTML = "";
+            document.getElementById('kruskal').innerHTML = "";
+        }
+    
+    </script>
+</body>
+</html>
