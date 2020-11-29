@@ -39,8 +39,6 @@ def get_graph():
         for i in triple_list:
             edge = i.split('-')
             edgelist.append(edge)
-            
-            print(edge)
             nodesets.add(edge[0])
             nodesets.add(edge[1])
         nodelist = list(nodesets)
